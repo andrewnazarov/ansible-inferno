@@ -2,5 +2,5 @@
 - name: Install and configure hosted Inferno OS
   hosts: all
   roles:
-    - common 
+    - inferno 
     

@@ -1,0 +1,80 @@
+---
+
+- name: Install all necessary libs and packages
+  become: yes
+  apt: 
+    pkg: "{{ item }}"
+    state: installed 
+    update_cache: true
+  with_items:
+    - build-essential
+    - gcc-multilib
+    - libxext-dev
+    - libxpm-dev
+    - x11proto-xext-dev
+    - mercurial
+    
+- name: Create directories
+  file: 
+    path: "{{ item }}" 
+    state: directory 
+  with_items:
+    - "{{ download_dir }}"
+    - "{{ inferno_home_dir }}"
+
+- name: Get Infeno source code from Vitanuova web site
+  get_url:
+    url: "http://www.vitanuova.com/dist/4e/{{ inferno_source_archive }}"
+    dest: "{{  download_dir }}"
+  register: archive
+
+- name: Unarchive Inferno source code  
+  unarchive: src="{{ download_dir }}/{{ inferno_source_archive }}" dest={{ download_dir }} copy=no
+  when: archive|changed
+  
+- name: Copy unarchived source code to Inferno home directory
+  command: "creates={{ inferno_home_dir }}/makemk.sh cp -r {{ download_dir }}/inferno/. {{ inferno_home_dir }}"
+
+- name: Pull the latest from official bitbucket repository
+  command: hg pull -uv chdir={{ inferno_home_dir }}
+  register: hg
+  changed_when: "'no changes found' not in hg.stdout"
+
+- name: Put environment variables to the dotfile
+  lineinfile: 
+    dest: "{{ dotfile }}" 
+    line: "{{ item }}"
+    insertafter: EOF
+    state: present
+  with_items:
+    - "export INFERNO_ROOT={{ inferno_home_dir }}" 
+    - "export PATH=$INFERNO_ROOT/Linux/386/bin:$PATH"
+    - "export EMU=\"-r$INFERNO_ROOT -c0 -g1024x768\""
+
+- name: Export environment variables
+  shell: ". {{ dotfile }}"
+  
+- name: Set up variables in mkconfig
+  lineinfile: 
+    dest: "{{ inferno_home_dir }}/mkconfig" 
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items:
+    - regexp: "^ROOT="
+      line: "ROOT={{ inferno_home_dir }}"
+    - regexp: "^SYSHOST="
+      line: "SYSHOST=Linux"
+    - regexp: "^OBJTYPE="
+      line: "OBJTYPE=386"
+
+# Consider the following: http://comments.gmane.org/gmane.os.inferno.general/5305
+- name: Add -fno-omit-frame-pointer to CFLAGS
+  lineinfile: 
+    dest: "{{ inferno_home_dir }}/mkfiles/mkfile-Linux-386" 
+    insertafter: "^CFLAGS="
+    line: " -fno-omit-frame-pointer\\"
+    state: present
+      
+- name: Compile Inferno
+  shell:  ./makemk.sh && mk -s nuke mkdirs install chdir={{ inferno_home_dir }}

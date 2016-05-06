@@ -1,0 +1,15 @@
+#Variables for Inferno
+
+# Environment
+dotfile: ~/.bashrc
+
+#Where to download and unpack
+download_dir: /tmp
+
+# Where to install
+inferno_home_dir: "/home/vagrant/inferno"
+
+# Sources
+inferno_source_archive: inferno-20150328.tgz
+inferno_source_repo: https://bitbucket.org/inferno-os/inferno-os
+

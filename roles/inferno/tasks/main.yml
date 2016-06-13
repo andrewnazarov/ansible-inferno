@@ -101,4 +101,7 @@
     state: present
       
 - name: Compile Inferno
-  shell:  ./makemk.sh && mk -s nuke mkdirs installchdir={{ inferno_home_dir }}
+  shell:  "./makemk.sh && mk -s nuke mkdirs install chdir={{ inferno_home_dir }}"
+  environment:
+    PATH: "{{ inferno_home_dir }}/Linux/386/bin:{{ ansible_env.PATH }}"
+   

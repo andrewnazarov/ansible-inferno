@@ -1,7 +1,7 @@
 #Variables for Inferno
 
 # Environment
-dotfile: ~/.bashrc
+dotfile: /home/vagrant/.bashrc
 
 #Where to download and unpack
 download_dir: /tmp

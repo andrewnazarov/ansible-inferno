@@ -11,15 +11,14 @@ TODO
 -------
 
 1. Indempotent compilation
-2. 64-bit support
-3. Inferno startup script
-4. Setup environment variables only once
-5. Variable for EMU
+2. Inferno startup script
+3. Setup environment variables only once
+4. Variable for EMU
 
 Requirements
 -----------------
 
-Debian Jessie (32-bit)
+Debian Jessie (both 32-bit and 64-bit are supported)
 
 Ansible > 2.0
 

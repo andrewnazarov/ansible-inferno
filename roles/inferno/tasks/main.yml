@@ -1,6 +1,29 @@
 ---
+- name: Check if i386 architecture is available
+  shell: "dpkg --print-foreign-architectures"
+  register: arch
 
-- name: Install all necessary libs and packages
+- name: Add architecture i386
+  become: yes
+  command: "dpkg --add-architecture i386"
+  when: arch.stdout.find('i386') == -1 and ansible_architecture == "x86_64"
+
+- name: Install all necessary libs and packages (64-bit)
+  become: yes
+  apt: 
+    pkg: "{{ item }}"
+    state: installed 
+    update_cache: true
+  with_items:
+    - build-essential
+    - gcc-multilib
+    - libxext-dev:i386
+    - libxpm-dev:i386
+    - x11proto-xext-dev:i386
+    - mercurial
+  when: ansible_architecture == "x86_64"
+
+- name: Install all necessary libs and packages (32-bit)
   become: yes
   apt: 
     pkg: "{{ item }}"
@@ -13,6 +36,7 @@
     - libxpm-dev
     - x11proto-xext-dev
     - mercurial
+  when: ansible_architecture != "x86_64"
     
 - name: Create directories
   file: 
@@ -77,4 +101,4 @@
     state: present
       
 - name: Compile Inferno
-  shell:  ./makemk.sh && mk -s nuke mkdirs install chdir={{ inferno_home_dir }}
+  shell:  ./makemk.sh && mk -s nuke mkdirs installchdir={{ inferno_home_dir }}

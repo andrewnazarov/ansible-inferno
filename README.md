@@ -12,8 +12,7 @@ TODO
 
 1. Indempotent compilation
 2. Inferno startup script
-3. Setup environment variables only once
-4. Variable for EMU
+3. Variable for EMU
 
 Requirements
 -----------------

@@ -74,9 +74,6 @@
     - "export INFERNO_ROOT={{ inferno_home_dir }}" 
     - "export PATH=$INFERNO_ROOT/Linux/386/bin:$PATH"
     - "export EMU=\"-r$INFERNO_ROOT -c0 -g1024x768\""
-
-- name: Export environment variables
-  shell: ". {{ dotfile }}"
   
 - name: Set up variables in mkconfig
   lineinfile: 
